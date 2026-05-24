@@ -94,7 +94,8 @@ chmod -x /etc/update-motd.d/91-contract-ua-esm-status
 
 # Disable Expanded Security Maintenance messages
 touch /var/lib/update-notifier/hide-esm-in-motd
-apt -y update
+# and rebuild cached messages
+/usr/lib/update-notifier/update-motd-updates-available --force
 
 # But add uptime info:
 install -m 700 /dev/null /etc/update-motd.d/99-uptime
