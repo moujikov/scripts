@@ -1,13 +1,14 @@
 #!/bin/sh
 
-# Run: curl -fsSL https://github.com/moujikov/scripts/raw/main/ubuntu-init.sh | sh -s -- 43210
+# Run: curl -fsSL https://github.com/moujikov/scripts/raw/main/ubuntu-init.sh | sh -s
+# optionally provide a custom SSH port as the first argument (e.g. ... | sh -s -- 43210)
 
-SSH_PORT=${1:-43210}
+SSH_PORT=${1:-22}
 
 #### Update & upgrade ####
 apt -y update
 apt -y full-upgrade
-apt -y install --no-install-recommends bat net-tools 
+apt -y install --no-install-recommends bat net-tools fail2ban
 
 ln -s /usr/bin/batcat /usr/local/bin/bat
 
