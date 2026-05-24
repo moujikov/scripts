@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Run: curl -fsSL https://github.com/moujikov/scripts/raw/main/ubuntu-init.sh | sh -s
-# optionally provide a custom SSH port as the first argument (e.g. ... | sh -s -- 43210)
+# Run: curl -fsSL https://github.com/moujikov/scripts/raw/main/ubuntu-init.sh | bash -s
+# optionally provide a custom SSH port as the first argument (e.g. ... | bash -s -- 43210)
 
 SSH_PORT=${1:-22}
 
