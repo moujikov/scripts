@@ -31,10 +31,10 @@ cat <<-'EOF' >/home/andrey/.ssh/authorized_keys
 EOF
 
 # Fix bash prompt and a few other things:
-echo $'\n\n' | tee >/dev/null -a /home/andrey/.bashrc /root/.bashrc 
+echo $'\n\n' | tee >/dev/null -a /root/.bashrc /home/andrey/.bashrc
 
-sed '/^###_mark_###/,$d' -i'' /home/andrey/.bashrc /root/.bashrc 
-cat <<-'EOF' | tee >/dev/null -a /home/andrey/.bashrc /root/.bashrc 
+sed '/^###_mark_###/,$d' -i'' /root/.bashrc /home/andrey/.bashrc  
+cat <<-'EOF' | tee >/dev/null -a /root/.bashrc /home/andrey/.bashrc
 	###_mark_### !!! Everything below this line is managed by a script – do not edit manually !!!
 
 	if [[ "$TERM" == *-color || "$TERM" == *-256color ]]; then
@@ -48,8 +48,9 @@ cat <<-'EOF' | tee >/dev/null -a /home/andrey/.bashrc /root/.bashrc
 EOF
 
 # Set up nano keybindings for andrey and root:
+install -m 644 /dev/null /root/.nanorc
 install -m 644 -o andrey -g andrey /dev/null /home/andrey/.nanorc
-cat <<-'EOF' | tee >/dev/null /home/andrey/.nanorc /root/.nanorc
+cat <<-'EOF' | tee >/dev/null /root/.nanorc /home/andrey/.nanorc 
 	bind M-b prevword main
 	bind M-f nextword main
 	bind ^W chopwordleft main
