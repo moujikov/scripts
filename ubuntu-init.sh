@@ -17,24 +17,24 @@ ln -s /usr/bin/batcat /usr/local/bin/bat
 adduser andrey --disabled-password --comment 'Andrey Moujikov'
 usermod -aG sudo andrey
 
-> /etc/sudoers.d/andrey cat <<-'EOF'
-	Defaults:andrey env_keep += "HOME"
+cat <<-'EOF' >/etc/sudoers.d/andrey 
+	Defaults:andrey env_keep += "PWD"
 	andrey ALL=(ALL:ALL) NOPASSWD:ALL
 EOF
 
 # Add SSH keys:
 install -m 700 -o andrey -g andrey -d /home/andrey/.ssh 
 install -m 600 -o andrey -g andrey /dev/null /home/andrey/.ssh/authorized_keys
-> /home/andrey/.ssh/authorized_keys cat <<-'EOF'
+cat <<-'EOF' >/home/andrey/.ssh/authorized_keys
 	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHA6WCh1yZ8AWMxYP7sgLTZy8KTWxgNzLthLS+SR+OMF VPS/VDS general ssh keys – andrey@macbook
 	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILq0eKhu+Qco7zXl3nfbtgsnpiUoaVBrmeaHNaC+Z0mk VPS/VDS general ssh keys – andrey@mobile
 EOF
 
 # Fix bash prompt and a few other things:
->> /home/andrey/.bashrc cat <<< $'\n\n'
+echo $'\n\n' | tee >/dev/null -a /home/andrey/.bashrc /root/.bashrc 
 
-sed '/^###_mark_###/,$d' -i'' /home/andrey/.bashrc
->> /home/andrey/.bashrc cat <<-'EOF'
+sed '/^###_mark_###/,$d' -i'' /home/andrey/.bashrc /root/.bashrc 
+cat <<-'EOF' | tee >/dev/null -a /home/andrey/.bashrc /root/.bashrc 
 	###_mark_### !!! Everything below this line is managed by a script – do not edit manually !!!
 
 	if [[ "$TERM" == *-color || "$TERM" == *-256color ]]; then
@@ -47,9 +47,9 @@ sed '/^###_mark_###/,$d' -i'' /home/andrey/.bashrc
 	alias bal='bat --paging=never --language log --plain'
 EOF
 
-# Set up nano keybindings:
+# Set up nano keybindings for andrey and root:
 install -m 644 -o andrey -g andrey /dev/null /home/andrey/.nanorc
-> /home/andrey/.nanorc cat <<-'EOF'
+cat <<-'EOF' | tee >/dev/null /home/andrey/.nanorc /root/.nanorc
 	bind M-b prevword main
 	bind M-f nextword main
 	bind ^W chopwordleft main
@@ -68,7 +68,7 @@ curl -L https://iterm2.com/misc/install_shell_integration.sh | sudo -u andrey ba
 
 #### Secure SSH access ####
 install -m 600 /dev/null /etc/ssh/sshd_config.d/00-secure-ssh.conf
-> /etc/ssh/sshd_config.d/00-secure-ssh.conf cat <<-EOF
+cat <<-EOF  >/etc/ssh/sshd_config.d/00-secure-ssh.conf
 	Port $SSH_PORT
 	PermitRootLogin no
 	PasswordAuthentication no
@@ -99,7 +99,7 @@ touch /var/lib/update-notifier/hide-esm-in-motd
 
 # But add uptime info:
 install -m 700 /dev/null /etc/update-motd.d/99-uptime
-> /etc/update-motd.d/99-uptime cat <<-'EOF'
+cat <<-'EOF' >/etc/update-motd.d/99-uptime
 	#!/bin/sh
 	echo Uptime: `/usr/bin/uptime`; echo
 EOF
