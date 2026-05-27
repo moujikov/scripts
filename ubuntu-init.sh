@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-# Run: curl -fsSL https://github.com/moujikov/scripts/raw/main/ubuntu-init.sh | bash -s
-# optionally provide a custom SSH port as the first argument (e.g. ... | bash -s -- 43210)
+# Run: curl -fsSL https://github.com/moujikov/scripts/raw/main/ubuntu-init.sh | sh -s
+# optionally provide a custom SSH port as the first argument (e.g. ... | sh -s -- 43210)
 
 SSH_PORT=${1:-22}
 
@@ -31,7 +31,7 @@ cat <<-'EOF' >/home/andrey/.ssh/authorized_keys
 EOF
 
 # Fix bash prompt and a few other things:
-echo $'\n\n' | tee >/dev/null -a /root/.bashrc /home/andrey/.bashrc
+printf '\n\n' | tee >/dev/null -a /root/.bashrc /home/andrey/.bashrc
 
 sed '/^###_mark_###/,$d' -i'' /root/.bashrc /home/andrey/.bashrc  
 cat <<-'EOF' | tee >/dev/null -a /root/.bashrc /home/andrey/.bashrc
