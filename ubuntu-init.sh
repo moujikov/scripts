@@ -30,27 +30,46 @@ cat <<-'EOF' >/home/andrey/.ssh/authorized_keys
 	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILq0eKhu+Qco7zXl3nfbtgsnpiUoaVBrmeaHNaC+Z0mk VPS/VDS general ssh keys – andrey@mobile
 EOF
 
-# Fix bash prompt and a few other things:
-printf '\n\n' | tee >/dev/null -a /root/.bashrc /home/andrey/.bashrc
 
-sed '/^###_mark_###/,$d' -i'' /root/.bashrc /home/andrey/.bashrc  
-cat <<-'EOF' | tee >/dev/null -a /root/.bashrc /home/andrey/.bashrc
+# Fix bash prompt and a few other things:
+cat >>/etc/bash.bashrc <<< $'\n\n'
+
+sed '/^###_mark_###/,$d' -i'' /etc/bash.bashrc
+cat >>/etc/bash.bashrc <<- 'EOF'
 	###_mark_### !!! Everything below this line is managed by a script – do not edit manually !!!
 
-	if [[ "$TERM" == *-color || "$TERM" == *-256color ]]; then
-	    [[ $EUID -eq 0 ]] && USER_COLOR='01;31' || USER_COLOR='01'
-	    PS1='\n\[\033['"$USER_COLOR"'m\]┌──\u@\h\[\033[00m\]:\[\033[36m\]$PWD\[\033[00m\] \n\[\033['"$USER_COLOR"'m\]\$\[\033[00m\] '
-	fi
+	prompt_command () {
+	    [ -r /etc/debian_chroot ] && debian_chroot=$(< /etc/debian_chroot)
+
+	    marks="${debian_chroot:+($debian_chroot) }"
+
+	    [ -n "$SUDO_USER" ] && marks="$marks<sudo> "
+	    [[ $SHLVL -gt 1 ]] && marks="$marks<nested> "
+
+	    U_COLOR=''; P_COLOR=''; M_COLOR=''; R_COLOR=''
+	    if [[ "$TERM" == *-color || "$TERM" == *-256color ]]; then
+	        [[ $EUID -eq 0 ]] && U_COLOR='\[\033[01;31m\]' || U_COLOR='\[\033[01m\]'
+	        P_COLOR='\[\033[36m\]'; M_COLOR='\[\033[31m\]'; R_COLOR='\[\033[00m\]'
+	    fi
+
+	    PS1="\n${U_COLOR}┌──\u@\h${R_COLOR}:${P_COLOR}\$PWD${R_COLOR} ${M_COLOR}${marks}${R_COLOR}\n${U_COLOR}\\\$${R_COLOR} "
+	}
+	export -f prompt_command
+	PROMPT_COMMAND='prompt_command'
+	export PROMPT_COMMAND
 
 	export BAT_THEME=gruvbox-dark
 
+	alias ls='ls --color=auto'
+	alias ip='ip -color=auto'
 	alias bal='bat --paging=never --language log --plain'
 EOF
+
 
 # Set up nano keybindings for andrey and root:
 install -m 644 /dev/null /root/.nanorc
 install -m 644 -o andrey -g andrey /dev/null /home/andrey/.nanorc
-cat <<-'EOF' | tee >/dev/null /root/.nanorc /home/andrey/.nanorc 
+tee >/dev/null /root/.nanorc /home/andrey/.nanorc <<-'EOF'
 	bind M-b prevword main
 	bind M-f nextword main
 	bind ^W chopwordleft main
@@ -69,7 +88,7 @@ curl -L https://iterm2.com/misc/install_shell_integration.sh | sudo -u andrey ba
 
 #### Secure SSH access ####
 install -m 600 /dev/null /etc/ssh/sshd_config.d/00-secure-ssh.conf
-cat <<-EOF  >/etc/ssh/sshd_config.d/00-secure-ssh.conf
+cat >/etc/ssh/sshd_config.d/00-secure-ssh.conf <<-EOF
 	Port $SSH_PORT
 	PermitRootLogin no
 	PasswordAuthentication no
@@ -100,7 +119,7 @@ touch /var/lib/update-notifier/hide-esm-in-motd
 
 # But add uptime info:
 install -m 700 /dev/null /etc/update-motd.d/99-uptime
-cat <<-'EOF' >/etc/update-motd.d/99-uptime
+cat >/etc/update-motd.d/99-uptime <<-'EOF' 
 	#!/bin/sh
 	echo Uptime: `/usr/bin/uptime`; echo
 EOF
