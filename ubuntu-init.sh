@@ -32,7 +32,7 @@ EOF
 
 
 # Fix bash prompt and a few other things:
-cat >>/etc/bash.bashrc <<< $'\n\n'
+printf '\n\n' >> /etc/bash.bashrc
 
 sed '/^###_mark_###/,$d' -i'' /etc/bash.bashrc
 cat >>/etc/bash.bashrc <<- 'EOF'
